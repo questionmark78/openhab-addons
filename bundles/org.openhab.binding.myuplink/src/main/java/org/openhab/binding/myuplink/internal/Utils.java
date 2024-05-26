@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2023 Contributors to the openHAB project
+ * Copyright (c) 2010-2024 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
@@ -46,10 +47,8 @@ public final class Utils {
     private Utils() {
     }
 
-    // TODO: check which methods are needed, delete unused
-
     /**
-     * parses a date string in easee format to ZonedDateTime which is used by Openhab.
+     * parses a date string in api source format to ZonedDateTime which is used by Openhab.
      *
      * @param date
      * @return
@@ -65,17 +64,29 @@ public final class Utils {
         return ZonedDateTime.parse(date, formatter);
     }
 
-    // /**
-    // * get element as JsonObject.
-    // *
-    // * @param jsonObject
-    // * @param key
-    // * @return
-    // */
-    // public static @Nullable JsonObject getAsJsonObject(@Nullable JsonObject jsonObject, String key) {
-    // JsonElement element = jsonObject == null ? null : jsonObject.get(key);
-    // return (element instanceof JsonObject) ? element.getAsJsonObject() : null;
-    // }
+    /**
+     * get element as JsonObject.
+     *
+     * @param jsonObject
+     * @param key
+     * @return
+     */
+    public static @Nullable JsonObject getAsJsonObject(@Nullable JsonObject jsonObject, String key) {
+        JsonElement element = jsonObject == null ? null : jsonObject.get(key);
+        return (element instanceof JsonObject) ? element.getAsJsonObject() : null;
+    }
+
+    /**
+     * get element as JsonArray.
+     *
+     * @param jsonObject
+     * @param key
+     * @return
+     */
+    public static JsonArray getAsJsonArray(@Nullable JsonObject jsonObject, String key) {
+        JsonElement element = jsonObject == null ? null : jsonObject.get(key);
+        return (element instanceof JsonArray) ? element.getAsJsonArray() : new JsonArray();
+    }
 
     /**
      * get element as String.
@@ -98,6 +109,19 @@ public final class Utils {
     }
 
     /**
+     * null safe version of getAsString with default value.
+     *
+     * @param jsonObject
+     * @param key
+     * @param defaultVal
+     * @return
+     */
+    public static String getAsString(@Nullable JsonObject jsonObject, String key, String defaultVal) {
+        String text = getAsString(jsonObject, key);
+        return text == null ? defaultVal : text;
+    }
+
+    /**
      * get element as int.
      *
      * @param jsonObject
@@ -109,17 +133,29 @@ public final class Utils {
         return (element instanceof JsonPrimitive) ? element.getAsInt() : 0;
     }
 
-    // /**
-    // * get element as boolean.
-    // *
-    // * @param jsonObject
-    // * @param key
-    // * @return
-    // */
-    // public static @Nullable Boolean getAsBool(@Nullable JsonObject jsonObject, String key) {
-    // JsonElement json = jsonObject == null ? null : jsonObject.get(key);
-    // return (json == null || json instanceof JsonNull) ? null : json.getAsBoolean();
-    // }
+    /**
+     * get element as boolean.
+     *
+     * @param jsonObject
+     * @param key
+     * @return
+     */
+    public static @Nullable Boolean getAsBool(@Nullable JsonObject jsonObject, String key) {
+        JsonElement json = jsonObject == null ? null : jsonObject.get(key);
+        return (json == null || json instanceof JsonNull) ? null : json.getAsBoolean();
+    }
+
+    /**
+     * null safe version of getAsBool with default value.
+     *
+     * @param jsonObject
+     * @param key
+     * @return
+     */
+    public static boolean getAsBool(@Nullable JsonObject jsonObject, String key, Boolean defaultValue) {
+        Boolean result = getAsBool(jsonObject, key);
+        return result == null ? defaultValue : result;
+    }
 
     /**
      * retrieves typeID of a channel.
@@ -151,21 +187,6 @@ public final class Utils {
                     "channel (" + channel.getUID().getId() + ") does not have a validation expression configured");
         }
         return expr;
-    }
-
-    /**
-     * retrieves the write API url suffix which is assigned to this channel.
-     *
-     * @param channel
-     * @return the url suffix
-     */
-    public static String getWriteCommand(Channel channel) {
-        String command = getPropertyOrParameter(channel, PARAMETER_NAME_WRITE_COMMAND);
-        if (command == null) {
-            throw new ConfigurationException(
-                    "channel (" + channel.getUID().getId() + ") does not have a write command configured");
-        }
-        return command;
     }
 
     /**

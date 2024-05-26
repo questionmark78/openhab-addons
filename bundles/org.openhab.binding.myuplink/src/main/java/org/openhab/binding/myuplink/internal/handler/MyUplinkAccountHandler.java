@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2023 Contributors to the openHAB project
+ * Copyright (c) 2010-2024 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -33,12 +33,10 @@ import org.openhab.binding.myuplink.internal.connector.WebInterface;
 import org.openhab.binding.myuplink.internal.discovery.MyUplinkDiscoveryService;
 import org.openhab.core.config.discovery.DiscoveryService;
 import org.openhab.core.thing.Bridge;
-import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.ThingStatus;
 import org.openhab.core.thing.ThingStatusDetail;
 import org.openhab.core.thing.binding.BaseBridgeHandler;
 import org.openhab.core.thing.binding.ThingHandlerService;
-import org.openhab.core.types.Command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,9 +80,6 @@ public class MyUplinkAccountHandler extends BaseBridgeHandler implements MyUplin
         updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.NONE, STATUS_WAITING_FOR_LOGIN);
         webInterface.start();
         startPolling();
-
-        // TODO: add command to update properties
-        // enqueueCommand(new GetSite(this, this::updateProperties));
     }
 
     /**
@@ -99,7 +94,6 @@ public class MyUplinkAccountHandler extends BaseBridgeHandler implements MyUplin
      * Poll the Easee Cloud API one time.
      */
     void pollingRun() {
-        // TODO: check if this is the best polling command?!
         GetSystems state = new GetSystems(this, this::updateOnlineStatus);
         enqueueCommand(state);
 

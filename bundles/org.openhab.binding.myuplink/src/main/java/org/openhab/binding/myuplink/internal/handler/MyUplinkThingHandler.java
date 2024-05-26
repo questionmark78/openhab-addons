@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2023 Contributors to the openHAB project
+ * Copyright (c) 2010-2024 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -95,7 +95,7 @@ public interface MyUplinkThingHandler extends ThingHandler, ChannelProvider {
         }
 
         String channelType = Utils.getChannelTypeId(channel);
-        if (!channelType.startsWith(CHANNEL_TYPEPREFIX_RW)) {
+        if (!channelType.startsWith(CHANNEL_TYPE_PREFIX_RW)) {
             getLogger().info("channel '{}' does not support write access - value to set '{}'",
                     channelUID.getIdWithoutGroup(), command);
             throw new UnsupportedOperationException(
@@ -129,7 +129,13 @@ public interface MyUplinkThingHandler extends ThingHandler, ChannelProvider {
     @Override
     default @Nullable Channel getChannel(String groupId, String channelId) {
         ThingUID thingUID = this.getThing().getUID();
-        ChannelGroupUID channelGroupUID = new ChannelGroupUID(thingUID, groupId);
-        return getThing().getChannel(new ChannelUID(channelGroupUID, channelId));
+        ChannelUID channelUID;
+        if (!groupId.isEmpty()) {
+            ChannelGroupUID channelGroupUID = new ChannelGroupUID(thingUID, groupId);
+            channelUID = new ChannelUID(channelGroupUID, channelId);
+        } else {
+            channelUID = new ChannelUID(thingUID, channelId);
+        }
+        return getThing().getChannel(channelUID);
     }
 }

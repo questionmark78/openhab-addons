@@ -1,18 +1,30 @@
+/**
+ * Copyright (c) 2010-2024 Contributors to the openHAB project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 package org.openhab.binding.myuplink.internal.discovery;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openhab.binding.myuplink.internal.MyUplinkBindingConstants.*;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.openhab.binding.myuplink.internal.connector.CommunicationStatus;
 import org.openhab.binding.myuplink.internal.handler.MyUplinkAccountHandler;
@@ -22,50 +34,56 @@ import org.openhab.core.thing.ThingUID;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+/**
+ * Unit Tests to verify behaviour of DiscoveryService implementation.
+ *
+ * @author Alexander Friese - initial contribution
+ */
+@NonNullByDefault
 @ExtendWith(MockitoExtension.class)
 public class MyUplinkDiscoveryServiceTest {
 
-    @Mock
-    private MyUplinkAccountHandler bridgeHandler;
+    private MyUplinkAccountHandler bridgeHandler = mock(MyUplinkAccountHandler.class);
 
-    @Mock
-    private CommunicationStatus communicationStatus;
+    private CommunicationStatus communicationStatus = mock(CommunicationStatus.class);
 
-    @Spy
-    private MyUplinkDiscoveryService discoveryService;
+    private MyUplinkDiscoveryService discoveryService = spy(MyUplinkDiscoveryService.class);
 
-    private final String emptyResponseString = "{\"page\":1,\"itemsPerPage\":100,\"numItems\":0,\"systems\":[]}";
-    private JsonObject emptyResponse;
+    private final String emptyResponseString = """
+            {"page":1,"itemsPerPage":100,"numItems":0,"systems":[]}
+              """;
+
+    private JsonObject emptyResponse = new JsonObject();
 
     private final String testResponseString = """
             {
-                \"page\": 0,
-                \"itemsPerPage\": 0,
-                \"numItems\": 0,
-                \"systems\": [
+                "page": 0,
+                "itemsPerPage": 0,
+                "numItems": 0,
+                "systems": [
                     {
-                        \"systemId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",
-                        \"name\": \"string\",
-                        \"securityLevel\": \"admin\",
-                        \"hasAlarm\": true,
-                        \"country\": \"string\",
-                        \"devices\": [
+                        "systemId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                        "name": "string",
+                        "securityLevel": "admin",
+                        "hasAlarm": true,
+                        "country": "string",
+                        "devices": [
                             {
-                                \"id\": \"Dev-1337\",
-                                \"connectionState\": \"Disconnected\",
-                                \"currentFwVersion\": \"string\",
-                                \"product\": {
-                                    \"serialNumber\": \"1337\",
-                                    \"name\": \"My Device 1337\"
+                                "id": "Dev-1337",
+                                "connectionState": "Disconnected",
+                                "currentFwVersion": "string",
+                                "product": {
+                                    "serialNumber": "1337",
+                                    "name": "My Device 1337"
                                 }
                             },
                             {
-                                \"id\": \"Dev-4712\",
-                                \"connectionState\": \"Disconnected\",
-                                \"currentFwVersion\": \"string\",
-                                \"product\": {
-                                    \"serialNumber\": \"4712\",
-                                    \"name\": \"My Device 4712\"
+                                "id": "Dev-4712",
+                                "connectionState": "Disconnected",
+                                "currentFwVersion": "string",
+                                "product": {
+                                    "serialNumber": "4712",
+                                    "name": "My Device 4712"
                                 }
                             }
                         ]
@@ -73,7 +91,8 @@ public class MyUplinkDiscoveryServiceTest {
                 ]
             }
             """;
-    private static JsonObject testResponse;
+
+    private static JsonObject testResponse = new JsonObject();
 
     @BeforeEach
     public void prepareTestData() {
